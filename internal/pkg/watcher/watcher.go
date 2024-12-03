@@ -57,6 +57,10 @@ func (w *Watcher) Stop() {
 
 	close(w.quitChannel)
 	w.running.Wait()
+
+	// close opened channels after all sub routines are finished
+	close(w.inCh)
+	close(w.outCh)
 }
 
 func (w *Watcher) GetWatcherId() string { return w.id }
