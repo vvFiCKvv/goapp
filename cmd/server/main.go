@@ -21,8 +21,13 @@ func init() {
 }
 
 func parseMainArguments() *MainArguments {
-	profilePtr := flag.Bool("use-profiler", false, "Boolean to using pprof profiling")
-	flag.Parse()
+	fs := flag.NewFlagSet("server", flag.ContinueOnError)
+	profilePtr := fs.Bool("use-profiler", false, "Boolean to using pprof profiling")
+
+	err := fs.Parse(os.Args[1:])
+	if err != nil {
+		log.Println(err) // prints an error message
+	}
 
 	return &MainArguments{
 		useProfiler: *profilePtr,
