@@ -5,6 +5,7 @@ import (
 	"goapp/internal/pkg/watcher"
 	integration "goapp/test/integration/base"
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/gorilla/websocket"
@@ -55,6 +56,13 @@ func TestValidWSResponse(t *testing.T) {
 			if response.Iteration != 1 {
 				t.Fatalf(`websocket responded with wrong iteration: %d`, response.Iteration)
 			}
+
+			r, _ := regexp.Compile("^[0-9A-F]+$")
+
+			if r.MatchString(response.Value) == false {
+				t.Fatalf(`websocket responded with wrong value: %s`, response.Value)
+			}
+
 			return
 		case err = <-errorChannel:
 			t.Fatalf(`Failed to read a websocket message: %+v`, err)
