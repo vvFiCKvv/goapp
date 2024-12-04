@@ -10,7 +10,7 @@ var randx = rand.NewSource(42)
 func RandString(n int) string {
 	const letterBytes = "0123456789ABCDEF"
 	const (
-		letterIdxBits = 6                    // 6 bits to represent a letter index
+		letterIdxBits = 4                    // 6 bits to represent a letter index
 		letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
 		letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
 	)

@@ -45,3 +45,15 @@ func TestValidCharacters(t *testing.T) {
 	}
 
 }
+
+func BenchmarkSmallRandom(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		RandString(5)
+	}
+}
+
+func BenchmarkBigRandom(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		RandString(500)
+	}
+}
