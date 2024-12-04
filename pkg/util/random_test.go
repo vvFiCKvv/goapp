@@ -37,7 +37,7 @@ func TestBigLength(t *testing.T) {
 
 func TestValidCharacters(t *testing.T) {
 	randomLength := 100
-	r, _ := regexp.Compile("^[a-zA-Z]*$")
+	r, _ := regexp.Compile("^[0-9A-F]*$")
 	randomValue := RandString(randomLength)
 
 	if r.MatchString(randomValue) == false {
