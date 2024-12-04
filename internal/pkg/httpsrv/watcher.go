@@ -19,7 +19,9 @@ func (s *Server) removeWatcher(w *watcher.Watcher) {
 			s.sessionStats[i].print()
 
 			// Remove unneeded stat
+			s.sessionStatsLock.Lock()
 			s.sessionStats = append(s.sessionStats[:i], s.sessionStats[i+1:]...)
+			s.sessionStatsLock.Unlock()
 			break
 		}
 	}

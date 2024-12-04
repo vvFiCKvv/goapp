@@ -1,12 +1,17 @@
-.DEFAULT_GOAL := goapp
+.DEFAULT_GOAL := all
 
 .PHONY: all
-all: clean goapp
+all: clean goapp client
 
 .PHONY: goapp
 goapp:
 	mkdir -p bin
-	go build -o bin ./...
+	go build -o bin ./cmd/server
+
+.PHONY: client
+client:
+	mkdir -p bin
+	go build -o bin ./cmd/client
 
 .PHONY: stress_sockets
 stress_sockets:
@@ -21,3 +26,7 @@ stress_sockets:
 clean:
 	go clean
 	rm -f bin/*
+
+.PHONY: test
+test:
+	go test -cpu=1 ./...

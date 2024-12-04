@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var StrGenTime = 1 * time.Second
+
 type StringGenerator struct {
 	strChan     chan<- string  // String output channel.
 	quitChannel chan struct{}  // Quit.
@@ -43,6 +45,6 @@ func (s *StringGenerator) mainLoop() {
 			return
 		default:
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(StrGenTime)
 	}
 }
