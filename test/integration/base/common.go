@@ -28,3 +28,5 @@ func (tb *IntegrationTest) SetupTest() func() {
 		exitChannel <- os.Kill
 	}
 }
+
+var Helper = IntegrationTest{}

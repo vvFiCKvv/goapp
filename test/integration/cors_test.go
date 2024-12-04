@@ -8,10 +8,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var helper = integration.IntegrationTest{}
-
 func TestInvalidOrigin(t *testing.T) {
-	teardownSuite := helper.SetupTest()
+	teardownSuite := integration.Helper.SetupTest()
 	defer teardownSuite()
 
 	headers := http.Header{}
@@ -24,7 +22,7 @@ func TestInvalidOrigin(t *testing.T) {
 }
 
 func TestValidOrigin(t *testing.T) {
-	teardownSuite := helper.SetupTest()
+	teardownSuite := integration.Helper.SetupTest()
 	defer teardownSuite()
 	headers := http.Header{}
 	testOrigin := "http://mytestsite.io"
@@ -36,7 +34,7 @@ func TestValidOrigin(t *testing.T) {
 }
 
 func TestSecondValidOrigin(t *testing.T) {
-	teardownSuite := helper.SetupTest()
+	teardownSuite := integration.Helper.SetupTest()
 	defer teardownSuite()
 	headers := http.Header{}
 	testOrigin := "http://localhost:8080"
