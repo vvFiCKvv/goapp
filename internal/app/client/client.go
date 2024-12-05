@@ -5,11 +5,14 @@ import (
 	"goapp/internal/pkg/watcher"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+var Port = 8080
 
 var Success = func(connectionIndex int, iteration int, value string) {
 	log.Printf(`[conn #%d] iteration: %d, value: %s`, connectionIndex, iteration, value)
@@ -31,7 +34,7 @@ func Start(options *ClientStartOptions) error {
 	for i := 0; i < options.ParallelConnections; i++ {
 		go func(wg *sync.WaitGroup, index int) {
 			defer wg.Done()
-			connectAndSendData(index, options.MessagesToSent)
+			connectAndReceiveData(index, options.MessagesToSent)
 		}(&w, i)
 	}
 	w.Wait()
@@ -39,7 +42,7 @@ func Start(options *ClientStartOptions) error {
 	return nil
 }
 
-func connectAndSendData(connectionIndex int, messagesToSent int) bool {
+func connectAndReceiveData(connectionIndex int, messagesToSent int) bool {
 	connection, err := connect(connectionIndex)
 	if err != nil {
 		return false
@@ -51,10 +54,6 @@ func connectAndSendData(connectionIndex int, messagesToSent int) bool {
 
 	bindReceiveChannels(connection, messageChannel, errorChannel)
 
-	// err = sendMessages(connection, connectionIndex, messagesToSent)
-	// if err != nil {
-	// 	return false
-	// }
 	err = receiveMessages(messageChannel, errorChannel, connectionIndex, messagesToSent)
 	if err != nil {
 		return false
@@ -112,22 +111,11 @@ func bindReceiveChannels(connection *websocket.Conn, messageChannel chan string,
 	}()
 }
 
-func sendMessages(connection *websocket.Conn, connectionIndex int, messagesToSent int) error {
-	for i := 0; i < messagesToSent; i++ {
-		err := connection.WriteMessage(websocket.TextMessage, []byte(""))
-		if err != nil {
-			Fail(connectionIndex, `Failed to send a websocket message`, err)
-			return err
-		}
-	}
-	return nil
-}
-
 func connect(connectionIndex int) (*websocket.Conn, error) {
 	headers := http.Header{}
-	originUrl := "http://localhost:8080"
+	originUrl := "http://localhost:" + strconv.Itoa(Port)
 	headers.Set("origin", originUrl)
-	c, _, err := websocket.DefaultDialer.Dial("ws://localhost:8080/goapp/ws", headers)
+	c, _, err := websocket.DefaultDialer.Dial("ws://localhost:"+strconv.Itoa(Port)+"/goapp/ws", headers)
 	if err != nil {
 		Fail(connectionIndex, `Connection`, err)
 		return nil, err

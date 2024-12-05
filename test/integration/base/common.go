@@ -12,7 +12,7 @@ type IntegrationTest struct {
 }
 
 func (tb *IntegrationTest) SetupTest() func() {
-
+	monkeyPatchesToRestore := monkeyPatches()
 	exitChannel := make(chan os.Signal, 1)
 	serverOptions := goapp.ServerStartOptions{ExitChannel: exitChannel, UseProfiler: false}
 	go func() {
@@ -20,7 +20,6 @@ func (tb *IntegrationTest) SetupTest() func() {
 			log.Fatalf("fatal: %+v\n", err)
 		}
 	}()
-	monkeyPatchesToRestore := monkeyPatches()
 	return func() {
 		for _, restoreCallback := range monkeyPatchesToRestore {
 			restoreCallback()

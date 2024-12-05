@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
+
+var Port = 8080
 
 type Server struct {
 	strChan          <-chan string               // String channel.
@@ -56,13 +59,13 @@ func (s *Server) Start() error {
 
 	// Create HTTP server.
 	s.server = &http.Server{
-		Addr:         "localhost:8080",
+		Addr:         "localhost:" + strconv.Itoa(Port),
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		IdleTimeout:  10 * time.Second,
 		Handler:      handlers.CombinedLoggingHandler(os.Stdout, r),
 	}
-
+	log.Printf("Listening in port: %d", Port)
 	// Start HTTP server.
 	go func() {
 		if err := s.server.ListenAndServe(); err != nil {

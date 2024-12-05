@@ -14,6 +14,7 @@ func monkeyPatchClient(t *testing.T, onSuccess func(connectionIndex int, iterati
 	originalSuccess := client.Success
 	originalFail := client.Fail
 	originalStatsPrint := httpsrv.StatsPrint
+	originalPort := client.Port
 	httpsrv.StatsPrint = func(id string, sent int) {
 		onStatsPrint(id, sent)
 	}
@@ -21,10 +22,12 @@ func monkeyPatchClient(t *testing.T, onSuccess func(connectionIndex int, iterati
 		t.Fatalf(`Error: #[conn #%d] %s, failed with error: %+v`, connectionIndex, message, err)
 	}
 	client.Success = onSuccess
+	client.Port = httpsrv.Port
 	return func() {
 		client.Success = originalSuccess
 		client.Fail = originalFail
 		httpsrv.StatsPrint = originalStatsPrint
+		client.Port = originalPort
 	}
 }
 

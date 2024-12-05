@@ -12,7 +12,7 @@ type MainArguments struct {
 }
 
 func parseMainArguments() *MainArguments {
-	fs := flag.NewFlagSet("client", flag.ContinueOnError)
+	fs := flag.NewFlagSet("client", flag.ExitOnError)
 	n := fs.Int("n", 1, "Int64 representing the number of multiple parallel connections")
 
 	err := fs.Parse(os.Args[1:])

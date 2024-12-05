@@ -20,13 +20,16 @@ func (s *Server) removeWatcher(w *watcher.Watcher) {
 
 			// Remove unneeded stat
 			s.sessionStatsLock.Lock()
-			s.sessionStats = append(s.sessionStats[:i], s.sessionStats[i+1:]...)
+			sessionStatsLength := len(s.sessionStats)
+			s.sessionStats[i] = s.sessionStats[sessionStatsLength-1] // Copy last element to index i.
+			s.sessionStats = s.sessionStats[:sessionStatsLength-1]   // Truncate slice.
+
+			// s.sessionStats = append(s.sessionStats[:i], s.sessionStats[i+1:]...)
 			s.sessionStatsLock.Unlock()
 			break
 		}
 	}
 	// Remove watcher.
-	s.watchers[w.GetWatcherId()] = nil
 	delete(s.watchers, w.GetWatcherId())
 }
 

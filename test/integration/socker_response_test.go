@@ -2,10 +2,12 @@ package integration
 
 import (
 	"encoding/json"
+	httpsrv "goapp/internal/pkg/httpsrv"
 	"goapp/internal/pkg/watcher"
 	integration "goapp/test/integration/base"
 	"net/http"
 	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/gorilla/websocket"
@@ -17,7 +19,7 @@ func TestValidWSResponse(t *testing.T) {
 	headers := http.Header{}
 	testOrigin := "http://mytestsite.io"
 	headers.Set("origin", testOrigin)
-	c, _, err := websocket.DefaultDialer.Dial("ws://localhost:8080/goapp/ws", headers)
+	c, _, err := websocket.DefaultDialer.Dial("ws://localhost:"+strconv.Itoa(httpsrv.Port)+"/goapp/ws", headers)
 	if err != nil {
 		t.Fatalf(`Connection failed with error: %+v`, err)
 	}
