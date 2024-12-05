@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -14,14 +15,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var Port = 8080
+
 type Server struct {
-	strChan      <-chan string               // String channel.
-	server       *http.Server                // Gorilla HTTP server.
-	watchers     map[string]*watcher.Watcher // Counter watchers (k: counterId).
-	watchersLock *sync.RWMutex               // Counter lock.
-	sessionStats []sessionStats              // Session stats.
-	quitChannel  chan struct{}               // Quit channel.
-	running      sync.WaitGroup              // Running goroutines.
+	strChan          <-chan string               // String channel.
+	server           *http.Server                // Gorilla HTTP server.
+	watchers         map[string]*watcher.Watcher // Counter watchers (k: counterId).
+	watchersLock     *sync.RWMutex               // Counter lock.
+	sessionStats     [](*sessionStats)           // Session stats.
+	sessionStatsLock *sync.RWMutex               // Counter lock.
+	quitChannel      chan struct{}               // Quit channel.
+	running          sync.WaitGroup              // Running goroutines.
 }
 
 func New(strChan <-chan string) *Server {
@@ -30,7 +34,8 @@ func New(strChan <-chan string) *Server {
 	s.server = nil // Set below.
 	s.watchers = make(map[string]*watcher.Watcher)
 	s.watchersLock = &sync.RWMutex{}
-	s.sessionStats = []sessionStats{}
+	s.sessionStatsLock = &sync.RWMutex{}
+	s.sessionStats = []*sessionStats{}
 	s.quitChannel = make(chan struct{})
 	s.running = sync.WaitGroup{}
 	return &s
@@ -54,13 +59,13 @@ func (s *Server) Start() error {
 
 	// Create HTTP server.
 	s.server = &http.Server{
-		Addr:         "localhost:8080",
+		Addr:         "localhost:" + strconv.Itoa(Port),
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		IdleTimeout:  10 * time.Second,
 		Handler:      handlers.CombinedLoggingHandler(os.Stdout, r),
 	}
-
+	log.Printf("Listening in port: %d", Port)
 	// Start HTTP server.
 	go func() {
 		if err := s.server.ListenAndServe(); err != nil {

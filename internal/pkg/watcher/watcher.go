@@ -35,8 +35,9 @@ func (w *Watcher) Start() error {
 		defer wg.Done()
 		for {
 			select {
-			case <-w.inCh:
+			case value := <-w.inCh:
 				w.counter.Iteration += 1
+				w.counter.Value = value
 				select {
 				case w.outCh <- w.counter:
 				case <-w.quitChannel:
@@ -57,6 +58,10 @@ func (w *Watcher) Stop() {
 
 	close(w.quitChannel)
 	w.running.Wait()
+
+	// close opened channels after all sub routines are finished
+	close(w.inCh)
+	close(w.outCh)
 }
 
 func (w *Watcher) GetWatcherId() string { return w.id }

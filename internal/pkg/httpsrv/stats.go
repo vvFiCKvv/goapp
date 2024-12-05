@@ -2,13 +2,17 @@ package httpsrv
 
 import "log"
 
+var StatsPrint = func(id string, sent int) {
+	log.Printf("session %s has received %d messages\n", id, sent)
+}
+
 type sessionStats struct {
 	id   string
 	sent int
 }
 
 func (w *sessionStats) print() {
-	log.Printf("session %s has received %d messages\n", w.id, w.sent)
+	StatsPrint(w.id, w.sent)
 }
 
 func (w *sessionStats) inc() {
@@ -24,5 +28,7 @@ func (s *Server) incStats(id string) {
 		}
 	}
 	// Not found, add new.
-	s.sessionStats = append(s.sessionStats, sessionStats{id: id, sent: 1})
+	s.sessionStatsLock.Lock()
+	defer s.sessionStatsLock.Unlock()
+	s.sessionStats = append(s.sessionStats, &sessionStats{id: id, sent: 1})
 }

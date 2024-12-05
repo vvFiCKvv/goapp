@@ -6,9 +6,17 @@ import (
 	"goapp/internal/pkg/strgen"
 	"log"
 	"os"
+	"runtime"
+
+	"github.com/pkg/profile"
 )
 
-func Start(exitChannel chan os.Signal) error {
+type ServerStartOptions struct {
+	ExitChannel chan os.Signal
+	UseProfiler bool
+}
+
+func Start(options *ServerStartOptions) error {
 	var (
 		strChan = make(chan string, 100) // String channel with max parallel counter processes.
 		strCli  = strgen.New(strChan)    // String generator.
@@ -30,7 +38,17 @@ func Start(exitChannel chan os.Signal) error {
 	log.Println("GoApp Started")
 	defer log.Println("GoApp Stopped")
 
-	<-exitChannel
+	<-options.ExitChannel
+
+	if options.UseProfiler {
+		// we need to write the memory profile before the server defers, to see what remains in the heap
+		writeMemoryProfile("./.pprof/")
+	}
 
 	return nil
+}
+
+func writeMemoryProfile(path string) {
+	runtime.GC()
+	profile.Start(profile.MemProfile, profile.ProfilePath(path)).Stop()
 }
